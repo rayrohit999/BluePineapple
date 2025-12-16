@@ -8,3 +8,9 @@ def isPrime(n):
     return True
 def isNonPrime(n):
     return not isPrime(n)
+
+
+print(isNonPrime(-5)) #true
+print(isNonPrime(0)) #true
+print(isNonPrime(4)) #true
+print(isNonPrime(5)) #false
