@@ -8,7 +8,7 @@ def kTopElements(nums,k):
         for i in row:
             d[i]+=1
 
-
+    print(d)
     temp=[]
     import heapq
     for key,v in d.items():

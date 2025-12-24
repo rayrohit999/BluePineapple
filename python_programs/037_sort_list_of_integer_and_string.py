@@ -11,7 +11,3 @@ print(sortList([]))
 print(sortList([1,2,3,4,123]))
 print(sortList(["a","A",'B','b',"rohit"]))
 print(sortList([1,2,3,4,"a","A",'B','b',"rohit","rahul","rohit",123]))
-
-
-
-
