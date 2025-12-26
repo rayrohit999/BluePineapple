@@ -28,5 +28,3 @@ if __name__ == "__main__":
     main_list = [1, 2]
     sub_list  = [1, 2, 3]
     print(isContainSublist(main_list,sub_list)) #False
-    
-
