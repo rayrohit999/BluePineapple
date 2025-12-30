@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Basic HTML5 Boilerplate" />
+    <title>Assignment 11</title>
+</head>
+<body>
+   <p id="timer" style="font-size: 50px; text-align: center;">10 Sec</p>
+
+
+   <script>
+    const timer = document.getElementById("timer");
+    let time = 10;
+
+    const timerId = setInterval(updateTimer,1000); 
+    function updateTimer() {
+        time = time - 1;
+        timer.innerText = `${time} Sec`;
+        if (time === 0) {
+            timer.innerText = "Time's up!"
+            clearInterval(timerId)
+        }
+    }
+
+   </script>
+
+</body>
+</html>

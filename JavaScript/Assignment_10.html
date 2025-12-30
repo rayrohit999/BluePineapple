@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Basic HTML5 Boilerplate" />
+    <title>Assignment 10</title>
+</head>
+<body>
+   <img src="./Assignment10.jpg" height="300px" id="image">
+   <br>
+   <button id="changeImage">Change Image</button>
+
+
+   <script>
+    const imageChangeButton = document.getElementById("changeImage");
+    const imageElement = document.getElementById("image");
+
+    imageChangeButton.onclick = () => {
+        imageElement.src = "./Assignment10_1.jpg";
+        imageChangeButton.textContent = "Image Changed";
+    }
+   </script>
+
+</body>
+</html>

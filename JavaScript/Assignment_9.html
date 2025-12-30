@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Basic HTML5 Boilerplate" />
+    <title>Assignment 9</title>
+</head>
+<body>
+    <p id="paragraph">
+        My name is Rohit Kumar. I am from Ara, Bihar. 
+        I have completed BCA from Lalit Narayan Mishra Institute of Economic Development and Social Change, Patna. 
+        Currently, persuing MCA from Pimpri Chinchwad College of Engineering.
+    </p>
+    <button id="changeToBlue">Blue Text</button>
+    <button id="changeToRed">Red Text</button>
+
+
+
+    <script>
+        const changeToBlueButton = document.getElementById("changeToBlue");
+        const changeToRedButton = document.getElementById("changeToRed");
+        const paragraph = document.getElementById("paragraph");
+
+        changeToBlueButton.onclick = () => {
+            paragraph.style = "color : blue;";
+        }
+
+        changeToRedButton.onclick = () => {
+            paragraph.style = "color : red;";
+        }
+    </script>
+</body>
+</html>

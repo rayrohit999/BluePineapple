@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Basic HTML5 Boilerplate" />
+    <title>Assignment 12</title>
+    <style>
+        body {
+            display : flex;
+            justify-content : center;
+            align-items : center;
+            height : 100vh;
+        }
+        .modal {
+            height : 200px;
+            width : 200px;
+            background-color : lightblue;
+            display : none;
+            border : 2px solid black;
+            text-align : center;
+        }
+
+        .showModal {
+            display: block;
+        }
+
+        #closeModal {
+            background-color : red;
+            color : white;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="showModal">Show Modal</button>
+
+    <div class="modal" id="modal">
+        <p>Welcome to assignment 12</p>
+        <button id="closeModal">Close</button>
+    </div>
+
+    <script>
+        const showModalButton = document.getElementById("showModal");
+        const closeModalButton = document.getElementById("closeModal");
+        const modalBox = document.getElementById("modal");
+
+        showModalButton.onclick = () => {
+            modalBox.classList.add("showModal");
+            showModalButton.style.display = "none";
+        }
+
+        closeModalButton.onclick = () => {
+            modalBox.classList.remove("showModal");
+            showModalButton.style.display = "inline-block";
+        }
+    </script>
+</body>
+</html>

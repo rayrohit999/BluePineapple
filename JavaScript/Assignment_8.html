@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Basic HTML5 Boilerplate" />
+    <title>Assignment 8</title>
+    <style>
+        .box {
+            background-color : lightblue;
+            height : 100px;
+            width : 100px;
+        }
+        .highlight {
+            background-color : red;
+            height : 100px;
+            width : 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="box" id="box"></div>
+    <br/>
+    <button id="toggleButton">Toggle Color</button>
+
+    <script>
+        const toggleButton = document.getElementById("toggleButton");
+        const box = document.getElementById("box");
+
+        toggleButton.onclick = () => {
+            if (box.className === "box"){
+                box.className = "highlight";
+            } else {
+                box.className = "box"
+            }
+        }
+    </script>
+</body>
+</html>

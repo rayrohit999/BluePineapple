@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Basic HTML5 Boilerplate" />
+    <title>Assignment 6</title>
+
+</head>
+<body>
+
+    <ul>
+        <li>Item 1</li>
+        <li>Item 2</li>
+    </ul>
+    <button onClick="addItem()">Add Item</button> | <button onClick="removeItem()">Remove Item</button>
+
+
+    <script>
+        function addItem() {
+            let ulList = document.getElementsByTagName("ul");
+
+            const itemCount = ulList[0].children.length;
+            const li = document.createElement("li");
+            li.textContent = `Item ${itemCount + 1}`;
+
+            ulList[0].appendChild(li);
+        }
+
+        function removeItem() {
+            let ulList = document.getElementsByTagName("ul")[0];
+
+            if (ulList.children.length > 0) {
+            ulList.removeChild(ulList.lastElementChild);
+            }
+        }
+    </script>
+</body>
+</html>
