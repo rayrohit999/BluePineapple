@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML CSS: Assignment 3</title>
+    <link rel="stylesheet" href="./assignment_3.css">
+</head>
+<body>
+    <div id="empTable">
+        <h3>Employee Table</h3>
+        <table  class="table" border="1">
+            <tr class="oddRow">
+                <th>Employee Id:</th>
+                <th>Name: </th>
+                <th>Designation: </th>
+                <th>Address: </th>
+                <th>Phone No.:</th>
+            </tr>
+            <tr class="evenRow">
+                <td>1</td>
+                <td>Rohit Kumar</td>
+                <td>Manager </td>
+                <td>Akurdi </td>
+                <td>9693054074</td>
+            </tr>
+            <tr class="oddRow">
+                <td>2</td>
+                <td>Himanshu Kumar</td>
+                <td>Assistent Manager</td>
+                <td>Patna</td>
+                <td>9905826833</td>
+            </tr>
+            <tr class="evenRow">
+                <td>3</td>
+                <td>Shubham Kumar</td>
+                <td>Intern</td>
+                <td>Chandigarh</td>
+                <td>6200487248</td>
+            </tr>
+            <tr class="oddRow">
+                <td>4</td>
+                <td>Aniket Wakte</td>
+                <td>Cloud Analyst</td>
+                <td>Akurdi </td>
+                <td>9693054074</td>
+            </tr>
+            <tr class="evenRow">
+                <td>5</td>
+                <td>Rohit Kumar</td>
+                <td>Software Engineer</td>
+                <td>Pimpri</td>
+                <td>9693054074</td>
+            </tr>
+        </table>
+    </div>
+    <div id="regForm">
+        <h3>Registration Form</h3>
+        <form action="#" method="post">
+            <div class="formInput">
+                <label for="name">Name:</label>
+                <input type="text" name="name" id="name" placeholder="Rohit Kumar">
+            </div>
+            <div class="formInput">
+                <label for="email">Email:</label>
+                <input type="email" name="email" id="email" placeholder="yourexample@gmail.com">
+            </div>
+            <div class="formInput">
+                <label for="phone">Mobile:</label>
+                <input type="tel" name="phone" id="phone" placeholder="9999999999">
+            </div>
+            <div class="formInput">
+                <label>Gender: </label>
+                <input type="radio" name="gender" id="male" value="male">
+                <label for="male">Male</label>
+                <input type="radio" name="gender" id="female" value="female">
+                <label for="female">Female</label>
+            </div>
+            <div class="formInput">
+                <label for="address">Address: </label>
+                <textarea name="address" id="address"></textarea>
+            </div>
+            <button type="submit" class="submitButton">Submit</button>
+        </form>
+    </div>
+</body>
+</html>

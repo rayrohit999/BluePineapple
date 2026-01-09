@@ -1,0 +1,17 @@
+/*
+This is exteranl CSS. We write seperate file for CSS with .css extension and then link it to our html file using link tag. 
+It increas reuseability of css as we can include same css file in multiple html pages.
+*/
+body {
+    margin: 0;
+    padding : 0;
+    background-color: rgb(153, 153, 240); 
+}
+
+h1 {
+    color: rgb(70, 17, 17);
+}
+p {
+    font-style: arial,sans-serif;
+    letter-spacing: 2px;
+}

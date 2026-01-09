@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Assignment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container my-4">
+
+    <!-- Server Time -->
+    <h2 id="serverTime" class="mb-4 text-primary">
+        Server Time :
+    </h2>
+
+    <!-- Add Teacher Button -->
+    <button
+        id="addTeacher"
+        class="btn btn-success mb-3"
+        data-bs-toggle="modal"
+        data-bs-target="#teacherModal">
+        Add Teacher
+    </button>
+
+    <!-- Teacher Table -->
+    <div class="table-responsive">
+        <table id="teacherTable" class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Teacher ID</th>
+                    <th>Name</th>
+                    <th>Subject</th>
+                    <th>Phone</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- rows will be added via javascript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- File Upload Section -->
+    <div class="fileUpload card p-3 my-4">
+        <h5 class="mb-3">Upload File</h5>
+
+        <div class="mb-2">
+            <input type="file" id="fileInput" class="form-control">
+        </div>
+
+        <button id="uploadBtn" class="btn btn-primary mb-2">Upload</button>
+
+        <progress id="uploadProgress" value="0" max="100" class="w-100"></progress>
+
+        <p id="uploadStatus" class="mt-2">Upload status:</p>
+    </div>
+
+    <!-- File Download Section -->
+    <div class="fileDownload card p-3 my-4">
+        <h5 class="mb-3">Download File</h5>
+
+        <div class="d-flex gap-2 mb-2">
+            <button id="downloadBtn" class="btn btn-primary">Download</button>
+            <button id="pauseBtn" class="btn btn-warning">Pause</button>
+            <button id="resumeBtn" class="btn btn-success">Resume</button>
+        </div>
+
+        <progress id="downloadProgress" value="0" max="100" class="w-100"></progress>
+    </div>
+
+</div>
+
+<!-- Teacher Form Modal -->
+<div class="modal fade" id="teacherModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Add / Edit Teacher</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-container">
+                    <form id="teacherForm">
+
+                        <div class="mb-3">
+                            <label for="TeacherID" class="form-label">TeacherID</label>
+                            <input type="text" name="TeacherID" id="TeacherID" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Name" class="form-label">Name</label>
+                            <input type="text" name="Name" id="Name" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Subject" class="form-label">Subject</label>
+                            <input type="text" name="Subject" id="Subject" class="form-control">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Phone" class="form-label">Phone</label>
+                            <input type="tel" name="Phone" id="Phone" class="form-control">
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success">Add</button>
+                        </div>
+
+                    </form>
+                    <!-- Message -->
+                    <p id="message" class="fw-bold text-danger"></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="./app.js"></script>
+
+</body>
+</html>
