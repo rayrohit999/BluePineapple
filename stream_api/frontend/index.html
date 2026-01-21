@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <button id="start">Play</button>
+    <pre id="output"></pre>
+
+<script>
+    const startBtn = document.querySelector("#start");
+    startBtn.addEventListener("click", () => {
+        const clientId = Math.random().toString(36).substring(7);
+        fetch(`http://localhost:3000/video-chunk?clientId=${clientId}`)
+        .then(res => res.body.getReader())
+        .then(reader => {
+            const decoder = new TextDecoder();
+            function read() {
+                reader.read().then(({done, value}) => {
+                    if (done) return;
+                    document.getElementById("output").textContent += decoder.decode(value);
+                    read();
+                });
+            }
+            read();
+        });
+    });
+</script>
+</body>
+</html>

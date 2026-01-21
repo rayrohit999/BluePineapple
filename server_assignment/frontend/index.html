@@ -5,30 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Server Assignment</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 </head>
 <body class="bg-light">
 
 <div class="container my-4">
 
     <!-- Server Time -->
-    <h2 id="serverTime" class="mb-4 text-primary">
-        Server Time :
-    </h2>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-clock"></i> Server Time
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-5 mb-2">
+                    <p class="mb-1"><strong>Status:</strong> 
+                        <span id="status" class="badge bg-secondary">Disconnected</span>
+                    </p>
+                </div>
+                <div class="col-md-7 mb-2">
+                    <p class="mb-1"><strong>Current Time:</strong> 
+                        <span id="time" class="fs-4 text-primary fw-bold">--:--:--</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- Add Teacher Button -->
-    <button
-        id="addTeacher"
-        class="btn btn-success mb-3"
-        data-bs-toggle="modal"
-        data-bs-target="#teacherModal">
-        Add Teacher
-    </button>
+    <!-- Action Buttons -->
+    <div class="mb-3 d-flex gap-2">
+        <button id="addTeacher" class="btn btn-success">Add Teacher</button>
+        <button id="editTeacher" class="btn btn-warning">Edit Teacher</button>
+        <button id="deleteTeacher" class="btn btn-danger">Delete Selected</button>
+    </div>
 
+    <p id="message" class="fw-bold text-danger"></p>
     <!-- Teacher Table -->
     <div class="table-responsive">
         <table id="teacherTable" class="table table-bordered table-striped align-middle">
             <thead class="table-dark">
                 <tr>
+                    <th><input type="checkbox" id="selectAll"></th>
                     <th>Teacher ID</th>
                     <th>Name</th>
                     <th>Subject</th>
@@ -70,54 +89,6 @@
         <progress id="downloadProgress" value="0" max="100" class="w-100"></progress>
     </div>
 
-</div>
-
-<!-- Teacher Form Modal -->
-<div class="modal fade" id="teacherModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Add / Edit Teacher</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-                <div class="form-container">
-                    <form id="teacherForm">
-
-                        <div class="mb-3">
-                            <label for="TeacherID" class="form-label">TeacherID</label>
-                            <input type="text" name="TeacherID" id="TeacherID" class="form-control" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="Name" class="form-label">Name</label>
-                            <input type="text" name="Name" id="Name" class="form-control" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="Subject" class="form-label">Subject</label>
-                            <input type="text" name="Subject" id="Subject" class="form-control">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="Phone" class="form-label">Phone</label>
-                            <input type="tel" name="Phone" id="Phone" class="form-control">
-                        </div>
-
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-success">Add</button>
-                        </div>
-
-                    </form>
-                    <!-- Message -->
-                    <p id="message" class="fw-bold text-danger"></p>
-                </div>
-            </div>
-
-        </div>
-    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

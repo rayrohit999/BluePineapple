@@ -1,5 +1,8 @@
 // const express = require('express');
 import express from 'express';
+import {createServer} from 'http';
+import { Server } from 'socket.io';
+import moment from 'moment-timezone';
 import {
     readFromCSV,
     writeToCSV,
@@ -16,31 +19,45 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
+//http server
+const server = createServer(app);
+
+
+// Initializing SOCKET.IO with CORS
+
+const io = new Server(server,{
+    cors: {
+        origin: "*",
+        mathods: ["GET", "POST"]
+    }
+});
+
+io.on('connection', (socket) =>{
+    console.log('client connected: ',socket.id);
+
+    //sending time every second to this client
+    const timeInterval = setInterval(() => {
+        const time = moment().tz('Asia/Kolkata'); // 'America/New_York' 'Australia/Sydney' 'Asia/Kolkata'
+        socket.emit('time-update', {
+            success: true,
+            time: time.format('h:mm:ss a')
+        });
+    },1000);
+
+    socket.on('disconnect', () => {
+        console.log('Client disconnected: ', socket.id);
+        clearInterval(timeInterval);
+    });
+});
+
 app.get('/', (req, res) => {
     res.send("hello world i am rohit kumar");
 });
 
-const server = app.listen(port, () => {
+server.listen(port, () => {
     console.log("app is listening at port",port);
 });
 server.setTimeout(10 * 60 * 1000);
-
-app.get('/time', (req, res) => {
-    try {
-        const time = new Date();
-
-        res.status(200).json({
-            success: true,
-            time: time.toLocaleTimeString()
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Failed to fetch time",
-            error: error.message
-        });
-    }
-});
 
 app.get('/teacher', async (req, res) => {
     try {
@@ -123,9 +140,38 @@ app.delete('/teacher', async (req, res) => {
             message: "Teacher deleted successfully"
         });
     } catch (err) {
+        console.log("Delete error: ", err);
         res.status(500).json({
             success: false,
             message: "Failed to delete teacher",
+            error: err.message
+        });
+    }
+});
+
+app.delete('/teacher/bulk', async (req, res) => {
+    try{
+        const { TeacherIDs } = req.body;
+
+        if (!TeacherIDs || !Array.isArray(TeacherIDs) || TeacherIDs.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Teacher IDs array is required"
+            });
+        }
+        
+        for (const TeacherID of TeacherIDs) {
+            await deleteFromCSV(TeacherID, './data/teachers.csv')
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `${TeacherIDs.length} teacher(s) deleted successfully`
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to delete teachers",
             error: err.message
         });
     }

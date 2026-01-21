@@ -1,43 +1,35 @@
-
 const serverTime = document.querySelector('#serverTime');
 
-function getTime() {
-    const url = 'http://localhost:3001/time';
+ const socket = io('http://localhost:3000');
+ socket.on('connect', () => {
+    document.getElementById('status').textContent = "Connected";
+ });
 
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            serverTime.textContent = 'Server Time: ' + data.time;
-        })
-        .catch(error => {
-            console.error('Error fetching time:', error);
-            serverTime.textContent = 'Unable to fetch time';
-        });
-}
+ socket.on('disconnect', () => {
+    document.getElementById('status').textContent = "Disconnected";
+ });
 
-setInterval(getTime, 1000);
+ socket.on('time-update', (data) => {
+    if (data.success) {
+        document.getElementById('time').textContent = data.time;
+    }
+ });
 
 let isEditMode = false;
+let currentEditRow = null;
+
+const message = document.querySelector('#message');
+const addTeacherBtn = document.querySelector('#addTeacher');
+const editTeacherBtn = document.querySelector('#editTeacher');
+const deleteTeacherBtn = document.querySelector('#deleteTeacher');
+const selectAllCheckbox = document.querySelector('#selectAll');
+
+
 
 function showTeachers() {
-    const teacherTable = document.querySelector("#teacherTable");
+    const tbody = document.querySelector("#teacherTable tbody");
     const url = "http://localhost:3000/teacher";
-
-    // Clear table & add header
-    teacherTable.innerHTML = `
-        <tr>
-            <th>Teacher ID</th>
-            <th>Name</th>
-            <th>Subject</th>
-            <th>Phone</th>
-            <th>Action</th>
-        </tr>
-    `;
+    tbody.innerHTML = ""
 
     fetch(url)
         .then(response => {
@@ -49,125 +41,169 @@ function showTeachers() {
         .then(data => {
             const teachers = data.data;
 
+            if (!teachers || teachers.length === 0) {
+                tbody.innerHTML = ""; // Clear any existing rows
+                selectAllCheckbox.checked = false;
+                updateButtonStates();
+                return;
+            }
+
             teachers.forEach(teacher => {
-                const row = document.createElement("tr");
-
-                const teacherIdCell = document.createElement("td");
-                teacherIdCell.textContent = teacher.TeacherID;
-
-                const nameCell = document.createElement("td");
-                nameCell.textContent = teacher.Name;
-
-                const subjectCell = document.createElement("td");
-                subjectCell.textContent = teacher.Subject;
-
-                const phoneCell = document.createElement("td");
-                phoneCell.textContent = teacher.Phone;
-
-                const actionCell = document.createElement("td");
-
-                // EDIT LINK
-                const editLink = document.createElement("button");
-                editLink.textContent = "Edit";
-                editLink.style.marginRight = "10px";
-                editLink.classList.add("btn", "btn-warning");
-                editLink.setAttribute("data-bs-toggle", "modal");
-                editLink.setAttribute("data-bs-target", "#teacherModal");
-                editLink.addEventListener("click", (e) => {
-                    e.preventDefault();
-
-                    document.querySelector("#TeacherID").value = teacher.TeacherID;
-                    document.querySelector("#Name").value = teacher.Name;
-                    document.querySelector("#Subject").value = teacher.Subject;
-                    document.querySelector("#Phone").value = teacher.Phone;
-
-                    document.querySelector("#TeacherID").disabled = true;
-
-                    isEditMode = true;
-                    message.textContent = "Editing Teacher: " + teacher.TeacherID;
-                });
-
-                // DELETE LINK
-                const deleteLink = document.createElement("button");
-                deleteLink.textContent = "Delete";
-                deleteLink.classList.add("btn", "btn-danger")
-                deleteLink.addEventListener("click", async (e) => {
-                    e.preventDefault();
-
-                    if (!confirm("Are you sure you want to delete this teacher?")) return;
-
-                    try {
-                        const response = await fetch("http://localhost:3000/teacher", {
-                            method: "DELETE",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({ TeacherID: teacher.TeacherID })
-                        });
-
-                        const result = await response.json();
-
-                        if (!response.ok) {
-                            throw new Error(result.message || "Delete failed");
-                        }
-
-                        message.textContent = "Teacher deleted successfully";
-                        showTeachers();
-
-                    } catch (error) {
-                        console.error(error);
-                        message.textContent = error.message || "Error deleting teacher";
-                    }
-                });
-
-                actionCell.appendChild(editLink);
-                actionCell.appendChild(deleteLink);
-
-                row.appendChild(teacherIdCell);
-                row.appendChild(nameCell);
-                row.appendChild(subjectCell);
-                row.appendChild(phoneCell);
-                row.appendChild(actionCell);
-
-                teacherTable.appendChild(row);
+                const row = createTeacherRow(teacher);
+                tbody.appendChild(row);
             });
+            selectAllCheckbox.checked = false;
+            updateButtonStates();
         })
         .catch(error => {
-            console.error('Error fetching teachers:', error);
-            const errorRow = document.createElement("tr");
-            const errorCell = document.createElement("td");
+            console.error("Error fetching teachers: ", error);
+            tbody.innerHTML = "";
+            const errorRow = document.createElement('tr');
+            const errorCell = document.createElement('td');
             errorCell.textContent = "Unable to fetch records";
-            errorCell.colSpan = 5;
+            errorCell.colSpan = 6;
+            errorCell.className = "text-center text-danger";
             errorRow.appendChild(errorCell);
-            teacherTable.appendChild(errorRow);
-        });
+            tbody.appendChild(errorRow);
+            
+            selectAllCheckbox.checked = false;
+            updateButtonStates();
+        })
 }
 
-showTeachers();
+function createTeacherRow(teacher, isNew = false) {
+    const row = document.createElement('tr');
 
+    const checkboxCell = document.createElement('td');
+    const checkbox = document.createElement('input');
+    checkbox.type = "checkbox";
+    checkbox.className = "teacher-checkbox";
+    checkbox.value = teacher.TeacherID;
+    checkbox.addEventListener("change", updateButtonStates);
+    checkboxCell.appendChild(checkbox);
 
-// teacher form handling
+    const teacherIdCell = document.createElement("td");
+    teacherIdCell.textContent = teacher.TeacherID;
 
-const form = document.querySelector("#teacherForm");
-const message = document.querySelector("#message");
+    const nameCell = document.createElement("td");
+    nameCell.textContent = teacher.Name;
 
-form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+    const subjectCell = document.createElement("td");
+    subjectCell.textContent = teacher.Subject || "";
 
+    const phoneCell = document.createElement("td");
+    phoneCell.textContent = teacher.Phone || "";
+
+    const actionCell = document.createElement("td");
+    actionCell.innerHTML = isNew ? "" : "-";
+
+    row.appendChild(checkboxCell);
+    row.appendChild(teacherIdCell);
+    row.appendChild(nameCell);
+    row.appendChild(subjectCell);
+    row.appendChild(phoneCell);
+    row.appendChild(actionCell);
+
+    return row;
+}
+
+function createEditableRow(teacher = null) {
+    const row = document.createElement("tr");
+    row.className = "editable-row";
+
+    const checkboxCell = document.createElement("td");
+    checkboxCell.innerHTML = "-";
+
+    const teacherIdCell = document.createElement("td");
+    const teacherIdInput = document.createElement("input");
+    teacherIdInput.type = "text";
+    teacherIdInput.className = "form-control form-control-sm";
+    teacherIdInput.name = "TeacherID";
+    teacherIdInput.value = teacher?.TeacherID || "";
+    teacherIdInput.disabled = teacher !== null; //Disable if editing
+    teacherIdInput.required = true;
+    teacherIdCell.appendChild(teacherIdInput);
+
+    const nameCell = document.createElement("td");
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.className = "form-control form-control-sm";
+    nameInput.name = "Name";
+    nameInput.value = teacher?.Name || "";
+    nameInput.required = true;
+    nameCell.appendChild(nameInput);
+
+    const subjectCell = document.createElement("td")
+    const subjectInput = document.createElement("input");
+    subjectInput.type = "text";
+    subjectInput.className = "form-control form-control-sm";
+    subjectInput.name = "Subject";
+    subjectInput.value = teacher?.Subject || "";
+    subjectCell.appendChild(subjectInput);
+
+    const phoneCell = document.createElement("td");
+    const phoneInput = document.createElement("input");
+    phoneInput.type = "tel";
+    phoneInput.className = "form-control form-control-sm";
+    phoneInput.name = "Phone";
+    phoneInput.value = teacher?.Phone || "";
+    phoneCell.appendChild(phoneInput);
+
+    const actionCell = document.createElement("td");
+    const saveBtn = document.createElement("button");
+    saveBtn.textContent = "Save";
+    saveBtn.className = "btn btn-sm btn-success me-1";
+    saveBtn.addEventListener("click", () => saveTeacher(row, teacher !== null));
+
+    const cancelBtn = document.createElement("button");
+    cancelBtn.textContent = "Cancel";
+    cancelBtn.className = "btn btn-sm btn-secondary";
+    cancelBtn.addEventListener("click", () => {
+        if (teacher) {
+            const normalRow = createTeacherRow(teacher);
+            row.replaceWith(normalRow);
+            currentEditRow = null;
+        } else {
+            row.remove();
+        }
+        updateButtonStates();
+        message.textContent = "";
+    });
+
+    actionCell.appendChild(saveBtn);
+    actionCell.appendChild(cancelBtn);
+
+    row.appendChild(checkboxCell);
+    row.appendChild(teacherIdCell);
+    row.appendChild(nameCell);
+    row.appendChild(subjectCell);
+    row.appendChild(phoneCell);
+    row.appendChild(actionCell);
+
+    return row;
+}
+
+async function saveTeacher(row, isEdit) {
+    const inputs = row.querySelectorAll("input");
     const teacherData = {
-        TeacherID: document.querySelector("#TeacherID").value.trim(),
-        Name: document.querySelector("#Name").value.trim(),
-        Subject: document.querySelector("#Subject").value.trim(),
-        Phone: document.querySelector("#Phone").value.trim()
+        TeacherID: inputs[0].value.trim(),
+        Name: inputs[1].value.trim(),
+        Subject: inputs[2].value.trim(),
+        Phone: inputs[3].value.trim()
     };
+    
+    if (!teacherData.TeacherID || !teacherData.Name) {
+        message.textContent = "TeacherID and Name are required";
+        return;
+    }
 
-    const method = isEditMode ? "PATCH" : "POST";
+    const method = isEdit ? "PATCH" : "POST";
 
     try {
         const response = await fetch("http://localhost:3000/teacher", {
             method,
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(teacherData)
         });
@@ -178,21 +214,143 @@ form.addEventListener("submit", async (e) => {
             throw new Error(result.message || "Operation failed");
         }
 
-        message.textContent = isEditMode
-            ? "Teacher updated successfully"
-            : "Teacher added successfully";
+        message.textContent = isEdit?"Teacher updated successfully":"Teacher added successfully";
+        message.className = "fw-bold text-success";
 
-        form.reset();
-        document.querySelector("#TeacherID").disabled = false;
-        isEditMode = false;
+        setTimeout(() => {
+            message.textContent = ""
+            message.className = "fw-bold text-danger";
+        }, 3000);
+
+        currentEditRow = null;
+        showTeachers();
+    } catch (error) {
+        console.error(error);
+        message.textContent = error.message || "Error saving teacher";
+        message.className = "fw-bold text-danger";
+    }
+}
+
+function getSelectedTeachers() {
+    const checkboxes = document.querySelectorAll(".teacher-checkbox:checked");
+    return Array.from(checkboxes).map(cb => cb.value);
+}
+
+function updateButtonStates() {
+    const selected = getSelectedTeachers();
+    const hasEditableRow = document.querySelector(".editable-row") !== null;
+    const hasTeachers = document.querySelectorAll(".teacher-checkbox").length > 0;
+    addTeacherBtn.disabled = hasEditableRow;
+    editTeacherBtn.disabled = selected.length !== 1 || hasEditableRow;
+    deleteTeacherBtn.disabled = selected.length === 0 || hasEditableRow;
+
+    //Disable "Select All" if no teachers
+    selectAllCheckbox.disabled = !hasTeachers;
+    if (!hasTeachers) {
+        selectAllCheckbox.checked = false;
+    }
+}
+
+// Add Teacher Button
+addTeacherBtn.addEventListener("click", () => {
+    const tbody = document.querySelector("#teacherTable tbody");
+    const editableRow = createEditableRow();
+    tbody.insertBefore(editableRow, tbody.firstChild);
+    updateButtonStates();
+    message.textContent = "Enter new teacher details";
+});
+
+// Edit Teacher Button
+editTeacherBtn.addEventListener("click", async () => {
+    const selected = getSelectedTeachers();
+    if (selected.length !== 1) return;
+
+    try {
+        const response = await fetch("http://localhost:3000/teacher");
+        const data = await response.json();
+        const teacher = data.data.find(t => t.TeacherID === selected[0]);
+
+        if (!teacher) {
+            message.textContent = "Teacher not found";
+            return;
+        }
+
+        const checkbox = document.querySelector(`.teacher-checkbox[value="${selected[0]}"]`);
+        const currentRow = checkbox.closest("tr");
+        const editableRow = createEditableRow(teacher);
+
+        currentRow.replaceWith(editableRow);
+        currentEditRow = editableRow;
+        updateButtonStates();
+        message.textContent = "Editing Teacher: " + teacher.TeacherID;
+
+    } catch (error) {
+        console.error(error);
+        message.textContent = "Error loading teacher data";
+    }
+});
+
+// Delete Selected Button
+deleteTeacherBtn.addEventListener("click", async () => {
+    const selected = getSelectedTeachers();
+    if (selected.length === 0) return;
+
+    const confirmMsg = selected.length === 1
+    ? "Are you sure want to delete this teacher?"
+    : `Are you sure want to delete ${selected.length} teachrs?`;
+
+    if (!confirm(confirmMsg)) return
+
+    try {
+        let response;
+        
+        if (selected.length === 1) {
+            response = await fetch("http://localhost:3000/teacher", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ TeacherID: selected[0] })
+            });
+        } else {
+            response = await fetch("http://localhost:3000/teacher/bulk", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ TeacherIDs: selected })
+            });
+        }
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Delete failed");
+        }
+
+        message.textContent = result.message;
+        message.className = "fw-bold text-success";
+
+        setTimeout(() => {
+            message.textContent = "";
+            message.className = "fw-bold text-danger";
+        }, 3000);
 
         showTeachers();
 
     } catch (error) {
         console.error(error);
-        message.textContent = error.message || "Error saving teacher";
+        message.textContent = error.message || "Error deleting teacher(s)";
     }
 });
+
+selectAllCheckbox.addEventListener("change", (e) => {
+    const checkboxes = document.querySelectorAll(".teacher-checkbox");
+    checkboxes.forEach(cb => cb.checked = e.target.checked);
+    updateButtonStates();
+});
+
+showTeachers();
 
 //upload button 
 
@@ -211,7 +369,7 @@ uploadBtn.addEventListener("click", () => {
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "http://localhost:3000/upload");
 
-    xhr.upload.onprogress = (e) => {
+    xhr.upload.onprogress = (e) => { //onprogress is using socket.io in backend
         if (e.lengthComputable) {
             progressBar.value = (e.loaded / e.total) * 100;
         }
@@ -255,7 +413,7 @@ downloadBtn.addEventListener("click", async () => {
 async function startDownload() {
     controller = new AbortController();
 
-    const response = await fetch("http://localhost:3000/download/samplevideo.mkv", {
+    const response = await fetch("http://localhost:3000/download/sample.pdf", {
         headers: {
             Range: `bytes=${downloadedBytes}-`
         },
@@ -263,7 +421,8 @@ async function startDownload() {
     });
 
     const reader = response.body.getReader();
-    const contentLength = +response.headers.get("Content-Length");
+    const contentLength = +response.headers.get("Content-Length") || +response.headers.get("Content-Range")?.split('/')[1];
+    const totalLength = downloadedBytes + contentLength;
 
     let received = 0;
     const chunks = [];
@@ -276,8 +435,7 @@ async function startDownload() {
         received += value.length;
         downloadedBytes += value.length;
 
-        downloadProgressBar.value =
-            (downloadedBytes / (downloadedBytes + contentLength)) * 100;
+        downloadProgressBar.value = (downloadedBytes / totalLength) * 100;
     }
 
     const blob = new Blob(chunks);
@@ -290,10 +448,15 @@ async function startDownload() {
 }
 
 pauseBtn.addEventListener("click", () => {
-    if (controller) controller.abort();
-});
-resumeBtn.addEventListener("click", () => {
-    startDownload();
+    if (controller) {
+        controller.abort();
+        pauseBtn.disabled = true;
+        resumeBtn.disabled = false;
+    }
 });
 
-bootstrap.Modal.getInstance(document.getElementById('teacherModal')).hide();
+resumeBtn.addEventListener("click", () => {
+    startDownload();
+    pauseBtn.disabled = false;
+    resumeBtn.disabled = true;
+});
