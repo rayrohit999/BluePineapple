@@ -29,3 +29,6 @@ def multiply(a:int, b:int) -> int:
 
 if __name__ == "__main__":
     print(multiply(5,2))
+    print(multiply(5, -2))
+    print(multiply(-5, 2))
+    print(multiply(-5, -2))
