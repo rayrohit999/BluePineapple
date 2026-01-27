@@ -1,7 +1,7 @@
 '''
 Write a function to convert a tuple of string values to a tuple of integer values.
 '''
-
+import pytest
 def convert_string_tuple_to_integer(string_tup: tuple[str, ...]) -> tuple[int, ...]:
     '''
     Takes tuple of string as input and returns a tuple of integers
@@ -40,3 +40,5 @@ if __name__ == "__main__":
         print("Error: input tuple can't be empty")
     except Exception as e:
         print(e)
+
+

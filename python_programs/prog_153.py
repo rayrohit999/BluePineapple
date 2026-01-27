@@ -3,7 +3,6 @@ Write a function to find the vertex of a parabola.
 Standard form of equation of parabola is y = aX^2 + bX + c
 Vertex of parabola (h, k) = (-b/2a, -D/4a)
 '''
-
 def getVertexParabola(a: int, b: int, c: int) -> tuple[int, int]:
     '''
     Takes coeeficent of a prabola equation as input and returns cordinate of vertex

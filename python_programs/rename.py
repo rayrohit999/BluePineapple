@@ -4,7 +4,9 @@ folder = Path(".")
 
 for file in folder.iterdir():
     if file.is_file():
-        new_name = file.stem[:3] + file.suffix
+        if file.stem == "rename" or file.stem == "exception" or file.stem == "test_156":
+            continue
+        new_name = "prog_"+ file.stem[:3] + file.suffix
         new_path = folder / new_name
 
         if new_path.exists():
