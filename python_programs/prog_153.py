@@ -28,4 +28,4 @@ if __name__ == "__main__":
         vertex = getVertexParabola(a, b, c)
         print(f"Vertex of parabola {a}X^2 + {b}X + {c} is ({vertex[0]}, {vertex[1]})")
     except ValueError:
-        print("Error: Entered value is not correct")
+        print("Error: Entered value is not correct.")
